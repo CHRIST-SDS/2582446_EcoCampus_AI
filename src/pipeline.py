@@ -1,118 +1,217 @@
 """
 EcoCampus AI
-Integrated AI Pipeline
+Integrated Local AI Pipeline
 
 Workflow:
+
 Classroom Image
-    -> YOLO11n Occupancy Detection
-    -> Energy Analysis
-    -> Local Gemma LLM Report
-    -> Local SD-Turbo Visualization
+       ↓
+YOLO11n Occupancy Detection
+       ↓
+Energy Analysis
+       ↓
+Local Gemma Energy Audit
+       ↓
+Local SD-Turbo Visualization
 """
 
 from pathlib import Path
-import subprocess
-import sys
+
+from detection import analyze_classroom
+from energy_analysis import calculate_energy, print_report
+from llm import generate_energy_report
+from image_generation import generate_classroom_image
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
-IMAGE_PATH = PROJECT_ROOT / "data" / "test_images" / "classroomtest.jpg"
+IMAGE_PATH = (
+    PROJECT_ROOT
+    / "data"
+    / "test_images"
+    / "real_classroom.jpg"
+)
 
-
-def run_detection():
-    """Run YOLO occupancy detection."""
-
-    print("\n" + "=" * 60)
-    print("STEP 1 — COMPUTER VISION")
-    print("=" * 60)
-
-    detection_script = PROJECT_ROOT / "src" / "detection.py"
-
-    result = subprocess.run(
-        [sys.executable, str(detection_script)],
-        capture_output=True,
-        text=True
-    )
-
-    print(result.stdout)
-
-    if result.returncode != 0:
-        print("Detection error:")
-        print(result.stderr)
-        raise RuntimeError("YOLO detection failed.")
-
-
-def run_llm():
-    """Run the local Gemma energy analysis."""
-
-    print("\n" + "=" * 60)
-    print("STEP 2 — LOCAL LLM")
-    print("=" * 60)
-
-    llm_script = PROJECT_ROOT / "src" / "llm.py"
-
-    result = subprocess.run(
-        [sys.executable, str(llm_script)],
-        capture_output=True,
-        text=True
-    )
-
-    print(result.stdout)
-
-    if result.returncode != 0:
-        print("LLM error:")
-        print(result.stderr)
-        raise RuntimeError("Local LLM analysis failed.")
-
-
-def run_image_generation():
-    """Generate the AI visualization using local SD-Turbo."""
-
-    print("\n" + "=" * 60)
-    print("STEP 3 — LOCAL IMAGE GENERATION")
-    print("=" * 60)
-
-    image_script = PROJECT_ROOT / "src" / "image_generation.py"
-
-    result = subprocess.run(
-        [sys.executable, str(image_script)],
-        capture_output=True,
-        text=True
-    )
-
-    print(result.stdout)
-
-    if result.returncode != 0:
-        print("Image generation error:")
-        print(result.stderr)
-        raise RuntimeError("Image generation failed.")
+OUTPUT_DIR = PROJECT_ROOT / "outputs"
 
 
 def main():
-    print("\n" + "=" * 60)
-    print("        ECOCAMPUS AI — INTEGRATED PIPELINE")
-    print("=" * 60)
 
-    print(f"\nInput image: {IMAGE_PATH}")
+    print("\n" + "=" * 65)
+    print("              ECOCAMPUS AI")
+    print("        LOCAL AI CLASSROOM ANALYSIS")
+    print("=" * 65)
+
+    print(f"\nInput image:")
+    print(IMAGE_PATH)
 
     if not IMAGE_PATH.exists():
         raise FileNotFoundError(
             f"Input image not found: {IMAGE_PATH}"
         )
 
-    run_detection()
-    run_llm()
-    run_image_generation()
+    # ---------------------------------------------------------
+    # STEP 1 — YOLO OCCUPANCY DETECTION
+    # ---------------------------------------------------------
 
-    print("\n" + "=" * 60)
-    print("PIPELINE COMPLETED SUCCESSFULLY")
-    print("=" * 60)
+    print("\n" + "-" * 65)
+    print("STEP 1 — YOLO11n OCCUPANCY DETECTION")
+    print("-" * 65)
 
-    print("\nGenerated outputs:")
-    print("  • YOLO detection → outputs/classroom_detection.jpg")
-    print("  • Energy report → Local Gemma output")
-    print("  • AI visualization → outputs/generated_classroom.png")
+    detection = analyze_classroom(
+        IMAGE_PATH,
+        output_dir=OUTPUT_DIR
+    )
+
+    people_detected = detection["persons_detected"]
+
+    print(
+        f"Persons detected   : {people_detected}"
+    )
+
+    print(
+        f"Occupancy level     : "
+        f"{detection['occupancy_level']}"
+    )
+
+    print(
+        f"Detection output    : "
+        f"{detection['annotated_image']}"
+    )
+
+    # ---------------------------------------------------------
+    # STEP 2 — ENERGY ANALYSIS
+    # ---------------------------------------------------------
+
+    print("\n" + "-" * 65)
+    print("STEP 2 — ENERGY ANALYSIS")
+    print("-" * 65)
+
+    energy = calculate_energy(
+        people_detected=people_detected,
+        duration_hours=1.0,
+
+        # These are configured prototype inputs.
+        # They are NOT detected by YOLO.
+        lights_on=True,
+        fans_on=True,
+        ac_on=True,
+        projector_on=False,
+    )
+
+    print_report(energy)
+
+    # ---------------------------------------------------------
+    # STEP 3 — LOCAL GEMMA ENERGY AUDIT
+    # ---------------------------------------------------------
+
+    print("\n" + "-" * 65)
+    print("STEP 3 — LOCAL GEMMA ENERGY AUDIT")
+    print("-" * 65)
+
+    report = generate_energy_report(
+        persons_detected=energy["people_detected"],
+        classroom_capacity=energy["classroom_capacity"],
+        occupancy_percentage=energy["occupancy_percentage"],
+        occupancy_level=detection["occupancy_level"],
+        energy_kwh=energy["energy_kwh"],
+        estimated_cost=energy["estimated_cost_inr"],
+        estimated_co2=energy["estimated_co2_kg"],
+        potential_saving=energy["potential_saving_inr"],
+        potential_co2_reduction=energy[
+            "potential_co2_reduction_kg"
+        ],
+        priority=energy["priority"],
+        lights_on=True,
+        fans_on=True,
+        ac_on=True,
+        projector_on=False,
+    )
+
+    print("\n----- GEMMA ENERGY AUDIT -----\n")
+    print(report)
+
+    report_path = OUTPUT_DIR / "energy_report.txt"
+
+    with open(report_path, "w", encoding="utf-8") as f:
+        f.write(report)
+
+    print(f"\nReport saved to: {report_path}")
+
+
+    # ---------------------------------------------------------
+    # STEP 4 — LOCAL SD-TURBO IMAGE GENERATION
+    # ---------------------------------------------------------
+
+    print("\n" + "-" * 65)
+    print("STEP 4 — LOCAL SD-TURBO VISUALIZATION")
+    print("-" * 65)
+
+    if people_detected == 0:
+        scenario = (
+            "an empty university classroom with "
+            "energy-saving systems recommended"
+        )
+    elif energy["occupancy_percentage"] < 25:
+        scenario = (
+            "a university classroom with very low occupancy "
+            "and unnecessary energy usage"
+        )
+    else:
+        scenario = (
+            "a normally occupied university classroom "
+            "using energy-efficient systems"
+        )
+
+    visualization_prompt = (
+        "Photorealistic university sustainability scene, "
+        f"{scenario}, "
+        "modern academic classroom, "
+        "energy-efficient LED lighting, "
+        "responsible electricity usage, "
+        "sustainable campus environment, "
+        "professional facility-management visualization, "
+        "realistic architecture, "
+        "high quality"
+    )
+
+    generated_path = OUTPUT_DIR / "generated_classroom.png"
+
+    generate_classroom_image(
+        visualization_prompt,
+        output_path=str(generated_path)
+    )
+
+    # ---------------------------------------------------------
+    # FINAL SUMMARY
+    # ---------------------------------------------------------
+
+    print("\n" + "=" * 65)
+    print("          ECOCAMPUS AI PIPELINE COMPLETED")
+    print("=" * 65)
+
+    print("\nFinal Outputs:")
+    print(
+        f"✓ YOLO detection : "
+        f"{detection['annotated_image']}"
+    )
+
+    print(
+        f"✓ Energy analysis: "
+        f"{energy['energy_kwh']:.2f} kWh"
+    )
+
+    print(
+        "✓ Gemma report   : "
+        "Generated successfully"
+    )
+
+    print(
+        f"✓ SD-Turbo image : "
+        f"{generated_path}"
+    )
+
+    print("\n" + "=" * 65)
 
 
 if __name__ == "__main__":
