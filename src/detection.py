@@ -1,13 +1,22 @@
 from ultralytics import YOLO
 from pathlib import Path
+import cv2
 
 
 MODEL_PATH = "yolo11n.pt"
 
 
-def analyze_classroom(image_path, output_dir="outputs"):
+def analyze_classroom(
+    image_path,
+    output_dir="outputs",
+    classroom_capacity=60
+):
     """
-    Detect people in a classroom image and estimate occupancy level.
+    Detect people in a classroom image and estimate occupancy.
+
+    Returns:
+        Dictionary containing person count, occupancy percentage,
+        occupancy level, and annotated image path.
     """
 
     model = YOLO(MODEL_PATH)
@@ -28,12 +37,17 @@ def analyze_classroom(image_path, output_dir="outputs"):
             if int(cls) == 0:
                 person_count += 1
 
-    # Simple occupancy classification
+    # Calculate occupancy percentage
+    occupancy_percentage = (
+        person_count / classroom_capacity
+    ) * 100
+
+    # Occupancy classification
     if person_count == 0:
         occupancy = "EMPTY"
-    elif person_count <= 5:
+    elif occupancy_percentage < 25:
         occupancy = "LOW"
-    elif person_count <= 15:
+    elif occupancy_percentage < 50:
         occupancy = "MODERATE"
     else:
         occupancy = "HIGH"
@@ -46,11 +60,17 @@ def analyze_classroom(image_path, output_dir="outputs"):
 
     output_path = output_dir / "classroom_detection.jpg"
 
-    import cv2
-    cv2.imwrite(str(output_path), annotated_image)
+    cv2.imwrite(
+        str(output_path),
+        annotated_image
+    )
 
     return {
         "persons_detected": person_count,
+        "classroom_capacity": classroom_capacity,
+        "occupancy_percentage": round(
+            occupancy_percentage, 2
+        ),
         "occupancy_level": occupancy,
         "annotated_image": str(output_path)
     }
@@ -58,11 +78,35 @@ def analyze_classroom(image_path, output_dir="outputs"):
 
 if __name__ == "__main__":
 
-    image_path = "data/test_images/classroomtest.jpg"
+    image_path = "data/test_images/real_classroom.jpg"
 
     result = analyze_classroom(image_path)
 
-    print("\n===== EcoCampus AI — Classroom Analysis =====")
-    print(f"Persons detected : {result['persons_detected']}")
-    print(f"Occupancy level   : {result['occupancy_level']}")
-    print(f"Output image      : {result['annotated_image']}")
+    print(
+        "\n===== EcoCampus AI — Classroom Analysis ====="
+    )
+
+    print(
+        f"Persons detected   : "
+        f"{result['persons_detected']}"
+    )
+
+    print(
+        f"Classroom capacity : "
+        f"{result['classroom_capacity']}"
+    )
+
+    print(
+        f"Occupancy          : "
+        f"{result['occupancy_percentage']}%"
+    )
+
+    print(
+        f"Occupancy level    : "
+        f"{result['occupancy_level']}"
+    )
+
+    print(
+        f"Output image       : "
+        f"{result['annotated_image']}"
+    )
