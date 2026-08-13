@@ -7,3 +7,4 @@ __pycache__/
 runs/
 *.pt
 .DS_Store
+outputs/
