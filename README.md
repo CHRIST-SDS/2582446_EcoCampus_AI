@@ -186,11 +186,26 @@ pip install -r requirements.txt
 
 ---
 
-## 7. Running the Application
+## Screenshots
 
-### Start Ollama
+### Dashboard
 
-Make sure Ollama is running and the Gemma model is available:
+![EcoCampus AI Dashboard](docs/screenshots/01_dashboard_AFTER.png)
 
-```bash
-ollama serve
+### Classroom Analysis
+
+![Classroom Analysis](docs/screenshots/02_analysis.png)
+
+### Dashboard Before Analysis
+
+![Dashboard Before Analysis](docs/screenshots/01_dashboard_BEFORE.png)
+
+---
+
+## Architecture
+
+![EcoCampus AI Architecture](docs/architecture.png)
+
+## Workflow
+
+![EcoCampus AI Workflow](docs/workflow.png)
