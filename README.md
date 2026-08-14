@@ -142,3 +142,44 @@ This distinction keeps the prototype's outputs transparent and reproducible.
                               ▼
                     ┌─────────────────────┐
                     │ Streamlit Dashboard │
+                    └─────────────────────┘
+```
+
+---
+
+## 6. Installation
+
+### Prerequisites
+
+The following software is required:
+
+- Python 3.11
+- Git
+- Ollama
+- A local Gemma model
+- Sufficient system resources for local Stable Diffusion Turbo image generation
+
+### Clone the Repository
+
+```bash
+git clone https://github.com/CHRIST-SDS/2582446_EcoCampus_AI.git
+cd 2582446_EcoCampus_AI
+```
+
+### Create and Activate the Virtual Environment
+
+```bash
+python -m venv .venv
+```
+
+Activate the virtual environment on Windows Git Bash:
+
+```bash
+source .venv/Scripts/activate
+```
+
+### Install Python Dependencies
+
+```bash
+pip install -r requirements.txt
+```
