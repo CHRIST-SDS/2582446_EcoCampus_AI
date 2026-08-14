@@ -1,0 +1,6 @@
+ultralytics==8.4.117
+opencv-python==5.0.0.93
+torch==2.13.0
+diffusers==0.39.0
+ollama==0.6.2
+streamlit==1.61.1
