@@ -183,3 +183,14 @@ source .venv/Scripts/activate
 ```bash
 pip install -r requirements.txt
 ```
+
+---
+
+## 7. Running the Application
+
+### Start Ollama
+
+Make sure Ollama is running and the Gemma model is available:
+
+```bash
+ollama serve
