@@ -1,0 +1,144 @@
+# EcoCampus AI
+
+## Local AI Classroom Energy Management System
+
+EcoCampus AI is a university-focused local AI application designed to identify classroom occupancy and estimate unnecessary energy consumption.
+
+The system combines computer vision, a local Large Language Model (LLM), local image generation, and a Streamlit interface in a single workflow.
+
+The application is designed to run locally without using cloud AI APIs such as OpenAI, Gemini, or Claude.
+
+---
+
+## 1. Problem Statement
+
+University classrooms may consume electricity through lighting, fans, air conditioning, and other equipment even when occupancy is low or the classroom is empty.
+
+Manual monitoring of classroom occupancy and energy usage can be inefficient and difficult to scale across multiple classrooms.
+
+EcoCampus AI addresses this problem by analyzing a classroom image using YOLO-based computer vision, estimating occupancy-based energy usage, generating a local AI energy audit using Gemma, and producing a visual representation using a local Stable Diffusion Turbo model.
+
+The goal is to provide a simple AI-assisted decision-support system for university facility and energy management.
+
+---
+
+## 2. Objectives
+
+- Detect people present in a classroom image.
+- Estimate classroom occupancy.
+- Estimate current classroom energy consumption.
+- Estimate potential electricity cost savings.
+- Estimate potential CO2 reduction.
+- Generate a professional energy audit using a local LLM.
+- Generate a visual classroom representation using a local image generation model.
+- Provide all results through a single Streamlit application.
+- Keep the complete AI workflow runnable locally.
+
+---
+
+## 3. Key Features
+
+### YOLO11n Occupancy Detection
+
+The system uses YOLO11n to detect people in the classroom image.
+
+The detected number of people is used to calculate:
+
+- Occupancy percentage
+- Occupancy level
+- Energy-use recommendation
+- Priority level
+
+### Occupancy-Based Energy Analysis
+
+The energy analysis module estimates:
+
+- Current appliance power
+- Current energy consumption
+- Estimated electricity cost
+- Estimated CO2 emissions
+- Recommended operating power
+- Recommended energy consumption
+- Potential cost saving
+- Potential CO2 reduction
+
+The energy values are estimates based on configured appliance power ratings and are not direct smart-meter measurements.
+
+### Local Gemma Energy Audit
+
+Gemma is accessed locally through Ollama.
+
+The LLM receives the occupancy and energy-analysis results and generates a structured university energy audit containing:
+
+1. Occupancy Assessment
+2. Energy-Waste Observation
+3. Estimated Energy and Cost Impact
+4. Recommended Actions
+5. Priority Level
+
+### Local SD-Turbo Image Generation
+
+The application uses a local Stable Diffusion Turbo model to generate a classroom visualization.
+
+The generated image is produced locally using the Diffusers library.
+
+### Streamlit Dashboard
+
+The complete workflow is accessible through a Streamlit interface.
+
+The dashboard allows a classroom image to be submitted and displays the analysis results and generated outputs.
+
+---
+
+## 4. Important System Design Note
+
+YOLO is used for occupancy detection only.
+
+The appliance states for lighting, fans, air conditioning, and projector are configured prototype inputs used by the energy-analysis engine.
+
+They are not detected from the classroom image.
+
+Similarly, electricity consumption is estimated from configured appliance power ratings rather than measured using a physical smart meter.
+
+This distinction keeps the prototype's outputs transparent and reproducible.
+
+---
+
+## 5. System Architecture
+
+```text
+                    ┌─────────────────────┐
+                    │   Classroom Image   │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │      YOLO11n        │
+                    │ Occupancy Detection │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │   Energy Analysis   │
+                    │                     │
+                    │ Occupancy + Power   │
+                    │ Cost + CO2 Estimate │
+                    └───────┬───────┬─────┘
+                            │       │
+                  ┌─────────┘       └──────────┐
+                  ▼                            ▼
+        ┌──────────────────┐        ┌────────────────────┐
+        │ Local Gemma LLM  │        │ Local SD-Turbo     │
+        │     Ollama       │        │ Image Generation   │
+        └────────┬─────────┘        └─────────┬──────────┘
+                 │                            │
+                 ▼                            ▼
+        ┌──────────────────┐        ┌────────────────────┐
+        │ Energy Audit     │        │ Generated Classroom│
+        │ Report           │        │ Visualization      │
+        └────────┬─────────┘        └─────────┬──────────┘
+                 │                            │
+                 └────────────┬───────────────┘
+                              ▼
+                    ┌─────────────────────┐
+                    │ Streamlit Dashboard │
