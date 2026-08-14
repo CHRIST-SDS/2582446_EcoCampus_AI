@@ -8,3 +8,4 @@ runs/
 *.pt
 .DS_Store
 outputs/
+demo/
