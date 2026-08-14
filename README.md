@@ -184,9 +184,32 @@ source .venv/Scripts/activate
 pip install -r requirements.txt
 ```
 
----
+### Set Up the Local Gemma Model - The project uses Gemma through Ollama.
 
-## Screenshots
+```bash
+ollama pull gemma3:4b
+```
+
+## 7. Usage
+
+After completing the installation and ensuring Ollama is running with the required Gemma model, start the Streamlit application:
+
+```bash
+streamlit run app.py
+```
+
+
+The Streamlit dashboard allows the user to upload a classroom image and run the complete local AI workflow.
+
+The workflow performs:
+
+1. YOLO11n-based classroom occupancy detection.
+2. Occupancy-based energy analysis.
+3. Local Gemma energy audit through Ollama.
+4. Local Stable Diffusion Turbo image generation.
+5. Display of the analysis and generated visualization in the Streamlit dashboard.
+
+## 8. Screenshots
 
 ### Dashboard
 
@@ -202,10 +225,28 @@ pip install -r requirements.txt
 
 ---
 
-## Architecture
+## 9. Architecture
 
 ![EcoCampus AI Architecture](docs/architecture.png)
 
-## Workflow
+## 10. Workflow
 
 ![EcoCampus AI Workflow](docs/workflow.png)
+
+## 11. Demo Video
+
+The project demonstration video is available in:
+
+`demo/demo.mp4`
+
+## 12. Project Outcome
+
+EcoCampus AI demonstrates how multiple local AI technologies can be integrated into a single university-focused application.
+
+The system combines:
+
+- Computer vision for classroom occupancy detection.
+- Rule-based energy estimation for energy analysis.
+- A local Gemma LLM for natural-language energy auditing.
+- A local Stable Diffusion Turbo model for visual generation.
+- Streamlit for an integrated user interface.
