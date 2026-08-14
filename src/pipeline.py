@@ -17,15 +17,12 @@ Local SD-Turbo Visualization
 
 from pathlib import Path
 import sys
-from src.detection import analyze_classroom
-from src.energy_analysis import calculate_energy, print_report
-from src.llm import generate_energy_report
-from src.image_generation import generate_classroom_image
 
 from src.detection import analyze_classroom
 from src.energy_analysis import calculate_energy, print_report
 from src.llm import generate_energy_report
 from src.image_generation import generate_classroom_image
+
 
 
 # ---------------------------------------------------------
@@ -147,23 +144,30 @@ def run_pipeline(image_path):
     print("-" * 65)
 
     report = generate_energy_report(
-        persons_detected=energy["people_detected"],
-        classroom_capacity=energy["classroom_capacity"],
-        occupancy_percentage=energy["occupancy_percentage"],
-        occupancy_level=detection["occupancy_level"],
-        energy_kwh=energy["energy_kwh"],
-        estimated_cost=energy["estimated_cost_inr"],
-        estimated_co2=energy["estimated_co2_kg"],
-        potential_saving=energy["potential_saving_inr"],
-        potential_co2_reduction=energy[
-            "potential_co2_reduction_kg"
-        ],
-        priority=energy["priority"],
-        lights_on=True,
-        fans_on=True,
-        ac_on=True,
-        projector_on=False,
-    )
+    persons_detected=energy["people_detected"],
+    classroom_capacity=energy["classroom_capacity"],
+    occupancy_percentage=energy["occupancy_percentage"],
+    occupancy_level=detection["occupancy_level"],
+
+    energy_kwh=energy["energy_kwh"],
+    estimated_cost=energy["estimated_cost_inr"],
+    estimated_co2=energy["estimated_co2_kg"],
+
+    recommended_power_kw=energy["recommended_power_kw"],
+    recommended_energy_kwh=energy["recommended_energy_kwh"],
+
+    potential_saving=energy["potential_saving_inr"],
+    potential_co2_reduction=energy[
+        "potential_co2_reduction_kg"
+    ],
+
+    priority=energy["priority"],
+
+    lights_on=True,
+    fans_on=True,
+    ac_on=True,
+    projector_on=False,
+)
 
     print("\n----- GEMMA ENERGY AUDIT -----\n")
     print(report)
